@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>পেশাদার ইনভেন্টরি ম্যানেজার</title>
+  
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --dark: #1f2937;
+      --gray: #6b7280;
+      --light-bg: #f8fafc;
+    }
+
+    body {
+      font-family: 'Segoe UI', 'Noto Sans Bengali', Arial, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      margin: 0;
+      padding: 20px;
+      color: var(--dark);
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 25px;
+      font-size: 28px;
+      border-bottom: 3px solid var(--primary);
+      padding-bottom: 15px;
+    }
+
+    h3 {
+      margin-top: 0;
+      color: var(--dark);
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+
+    /* Product Management Section */
+    .product-mgmt {
+      background: var(--light-bg);
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .mgmt-grid {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .mgmt-grid input {
+      padding: 12px 15px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+
+    .mgmt-btn {
+      background: var(--success);
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .mgmt-btn:hover {
+      background: #16a34a;
+    }
+
+    /* Form Styles */
+    .form-section {
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 25px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr auto;
+      gap: 15px;
+      align-items: end;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label {
+      font-weight: 600;
+      color: var(--dark);
+      font-size: 14px;
+    }
+
+    input, select {
+      padding: 12px 15px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      outline: none;
+      transition: all 0.3s;
+      font-size: 15px;
+      background: white;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.3s;
+      font-size: 15px;
+    }
+
+    .add-btn {
+      background: var(--primary);
+      color: white;
+      padding: 12px 25px;
+      height: 45px;
+    }
+    .add-btn:hover {
+      background: #4338ca;
+      transform: translateY(-2px);
+    }
+
+    /* Search & Filter */
+    .search-section {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr auto;
+      gap: 15px;
+      margin-bottom: 25px;
+      align-items: end;
+    }
+
+    .search-box {
+      background: white;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 0 15px;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-box input {
+      border: none;
+      padding: 12px 0;
+      flex: 1;
+    }
+
+    .search-icon {
+      color: var(--gray);
+      margin-right: 10px;
+    }
+
+    .filter-btn {
+      background: var(--warning);
+      color: white;
+      padding: 12px 20px;
+    }
+
+    /* Table Styles */
+    .table-container {
+      overflow-x: auto;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      background: #f1f5f9;
+      text-align: left;
+      padding: 15px;
+      border-bottom: 2px solid #e5e7eb;
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    td {
+      padding: 15px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    tr:hover {
+      background: #f8fafc;
+    }
+
+    .category-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .food { background: #d1fae5; color: #065f46; }
+    .electronics { background: #dbeafe; color: #1e40af; }
+    .stationary { background: #fef3c7; color: #92400e; }
+    .other { background: #e5e7eb; color: #374151; }
+
+    .action-btns {
+      display: flex;
+      gap: 10px;
+    }
+
+    .action-btns button {
+      padding: 8px 15px;
+      font-size: 14px;
+    }
+
+    .edit-btn { background: var(--warning); color: white; }
+    .edit-btn:hover { background: #d97706; }
+
+    .del-btn { background: var(--danger); color: white; }
+    .del-btn:hover { background: #dc2626; }
+
+    /* Summary Bar */
+    .summary {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 25px;
+      padding: 20px;
+      background: #f1f5f9;
+      border-radius: 10px;
+      font-weight: bold;
+      border: 1px solid #e5e7eb;
+    }
+
+    .summary-item {
+      text-align: center;
+      flex: 1;
+    }
+
+    .summary-number {
+      display: block;
+      font-size: 28px;
+      color: var(--primary);
+      margin-top: 5px;
+    }
+
+    /* Action Buttons */
+    .action-section {
+      display: flex;
+      gap: 15px;
+      margin-top: 25px;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      flex: 1;
+      padding: 15px;
+      min-width: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .print-btn { background: var(--dark); color: white; }
+    .export-btn { background: var(--success); color: white; }
+    .clear-btn { background: var(--danger); color: white; }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    }
+
+    .modal h3 {
+      margin-top: 0;
+      color: var(--primary);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 15px;
+      margin-top: 25px;
+      justify-content: flex-end;
+    }
+
+    /* Product List */
+    .product-list {
+      background: var(--light-bg);
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 10px;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    .product-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      background: white;
+      border-radius: 6px;
+      margin-bottom: 5px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .del-product-btn {
+      background: var(--danger);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .mgmt-grid,
+      .form-grid, 
+      .search-section {
+        grid-template-columns: 1fr;
+      }
+      
+      .action-section {
+        flex-direction: column;
+      }
+      
+      .action-btn {
+        min-width: auto;
+      }
+    }
+
+    @media print {
+      .product-mgmt,
+      .form-section, 
+      .search-section, 
+      .action-section,
+      .action-btns, 
+      th:last-child, 
+      td:last-child {
+        display: none !important;
+      }
+      
+      body { background: white; padding: 0; }
+      .container { box-shadow: none; border: none; width: 100%; }
+      
+      .summary {
+        border: 1px solid #000;
+        margin-top: 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>📦 পেশাদার ইনভেন্টরি ব্যবস্থাপনা</h2>
+
+  <!-- Product Management Section -->
+  <div class="product-mgmt">
+    <h3>📋 প্রোডাক্ট ম্যানেজমেন্ট</h3>
+    <div class="mgmt-grid">
+      <input type="text" id="newProductInput" placeholder="নতুন প্রোডাক্টের নাম লিখুন...">
+      <button class="mgmt-btn" onclick="addProduct()">
+        ➕ প্রোডাক্ট সংরক্ষণ করুন
+      </button>
+      <button class="mgmt-btn" style="background: var(--dark);" onclick="showProductList()">
+        📋 সব প্রোডাক্ট দেখুন
+      </button>
+    </div>
+    
+    <!-- Product List (Hidden by default) -->
+    <div id="productListContainer" class="product-list" style="display: none;">
+      <h4 style="margin-top: 0;">সর্বমোট প্রোডাক্ট: <span id="productCount">0</span></h4>
+      <div id="productList"></div>
+    </div>
+  </div>
+
+  <!-- Add Item Form -->
+  <div class="form-section">
+    <h3>➕ নতুন আইটেম যোগ করুন</h3>
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="productSelect">প্রোডাক্ট নির্বাচন করুন</label>
+        <select id="productSelect" required>
+          <option value="">-- প্রোডাক্ট নির্বাচন করুন --</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="qtyInput">পরিমাণ</label>
+        <input type="number" id="qtyInput" placeholder="পরিমাণ" min="1" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="categorySelect">ক্যাটাগরি</label>
+        <select id="categorySelect">
+          <option value="other">অন্যান্য</option>
+          <option value="food">খাদ্যদ্রব্য</option>
+          <option value="electronics">ইলেকট্রনিক্স</option>
+          <option value="stationary">লেখন সামগ্রী</option>
+        </select>
+      </div>
+      
+      <button class="add-btn" onclick="addItem()">
+        <span style="font-size: 18px; margin-right: 8px;">+</span> আইটেম যোগ করুন
+      </button>
+    </div>
+  </div>
+
+  <!-- Search & Filter -->
+  <div class="search-section">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="প্রোডাক্ট খুঁজুন..." onkeyup="filterItems()">
+    </div>
+    
+    <div class="form-group">
+      <label for="categoryFilter">ক্যাটাগরি ফিল্টার</label>
+      <select id="categoryFilter" onchange="filterItems()">
+        <option value="all">সব ক্যাটাগরি</option>
+        <option value="food">খাদ্যদ্রব্য</option>
+        <option value="electronics">ইলেকট্রনিক্স</option>
+        <option value="stationary">লেখন সামগ্রী</option>
+        <option value="other">অন্যান্য</option>
+      </select>
+    </div>
+    
+    <button class="filter-btn" onclick="clearFilters()">
+      ফিল্টার সরান
+    </button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>প্রোডাক্টের নাম</th>
+          <th>ক্যাটাগরি</th>
+          <th>পরিমাণ</th>
+          <th style="text-align: center;">কর্ম</th>
+        </tr>
+      </thead>
+      <tbody id="listBody">
+        <!-- Items will be inserted here -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Summary -->
+  <div class="summary">
+    <div class="summary-item">
+      মোট আইটেম
+      <span class="summary-number" id="totalItems">0</span>
+    </div>
+    <div class="summary-item">
+      মোট পরিমাণ
+      <span class="summary-number" id="totalQty">0</span>
+    </div>
+    <div class="summary-item">
+      ক্যাটাগরি সংখ্যা
+      <span class="summary-number" id="totalCategories">0</span>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="action-section">
+    <button class="action-btn print-btn" onclick="window.print()">
+      🖨️ প্রিন্ট করুন
+    </button>
+    <button class="action-btn export-btn" onclick="exportToExcel()">
+      📊 এক্সেলে রপ্তানি করুন
+    </button>
+    <button class="action-btn clear-btn" onclick="showClearModal()">
+      🗑️ সব মুছে ফেলুন
+    </button>
+  </div>
+</div>
+
+<!-- Clear Confirmation Modal -->
+<div class="modal" id="clearModal">
+  <div class="modal-content">
+    <h3>নিশ্চিত করুন</h3>
+    <p>আপনি কি নিশ্চিত যে আপনি সকল ইনভেন্টরি আইটেম মুছে ফেলতে চান? এই কাজটি পূর্বাবস্থায় ফেরানো যাবে না।</p>
+    <div class="modal-actions">
+      <button onclick="closeModal()" style="background: var(--gray); color: white; padding: 10px 20px;">
+        বাতিল করুন
+      </button>
+      <button onclick="clearAll()" style="background: var(--danger); color: white; padding: 10px 20px;">
+        মুছে ফেলুন
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Initialize data
+  let productsRepo = JSON.parse(localStorage.getItem("productsRepo")) || [];
+  let tableData = JSON.parse(localStorage.getItem("currentTableData")) || [];
+  
+  // Category names in Bengali
+  const categoryNames = {
+    "food": "খাদ্যদ্রব্য",
+    "electronics": "ইলেকট্রনিক্স",
+    "stationary": "লেখন সামগ্রী",
+    "other": "অন্যান্য"
+  };
+
+  // Initial Load
+  window.onload = () => {
+    updateProductDropdown();
+    renderTable();
+    updateSummary();
+  };
+
+  // Update product dropdown
+  function updateProductDropdown() {
+    const select = document.getElementById("productSelect");
+    select.innerHTML = '<option value="">-- প্রোডাক্ট নির্বাচন করুন --</option>';
+    
+    // Sort products alphabetically
+    productsRepo.sort();
+    
+    productsRepo.forEach(product => {
+      const option = new Option(product, product);
+      select.add(option);
+    });
+    
+    // Update product count
+    document.getElementById("productCount").innerText = productsRepo.length;
+  }
+
+  // Add new product to repo
+  function addProduct() {
+    const name = document.getElementById("newProductInput").value.trim();
+    
+    if (!name) {
+      alert("দয়া করে প্রোডাক্টের নাম লিখুন!");
+      return;
+    }
+
+    if (!productsRepo.includes(name)) {
+      productsRepo.push(name);
+      localStorage.setItem("productsRepo", JSON.stringify(productsRepo));
+      updateProductDropdown();
+      
+      // Clear input
+      document.getElementById("newProductInput").value = "";
+      
+      // Auto-select the new product
+      document.getElementById("productSelect").value = name;
+      document.getElementById("qtyInput").focus();
+      
+      alert(`"${name}" প্রোডাক্ট সফলভাবে সংরক্ষণ করা হয়েছে!`);
+    } else {
+      alert("এই প্রোডাক্টটি ইতিমধ্যে সংরক্ষণ করা আছে!");
+    }
+  }
+
+  // Show/Hide product list
+  function showProductList() {
+    const container = document.getElementById("productListContainer");
+    const listDiv = document.getElementById("productList");
+    
+    if (container.style.display === "none") {
+      // Show product list
+      listDiv.innerHTML = "";
+      
+      if (productsRepo.length === 0) {
+        listDiv.innerHTML = `<p style="text-align: center; color: var(--gray);">কোনো প্রোডাক্ট সংরক্ষণ করা নেই</p>`;
+      } else {
+        productsRepo.forEach((product, index) => {
+          const itemDiv = document.createElement("div");
+          itemDiv.className = "product-item";
+          itemDiv.innerHTML = `
+            <span>${index + 1}. ${product}</span>
+            <button class="del-product-btn" onclick="deleteProduct('${product}')">মুছুন</button>
+          `;
+          listDiv.appendChild(itemDiv);
+        });
+      }
+      
+      container.style.display = "block";
+    } else {
+      container.style.display = "none";
+    }
+  }
+
+  // Delete a product from repo
+  function deleteProduct(productName) {
+    if (confirm(`আপনি কি "${productName}" প্রোডাক্টটি মুছে ফেলতে চান?\n\nদ্রষ্টব্য: এই প্রোডাক্টটি ইনভেন্টরিতেও থাকলে সেটি থেকে মুছে যাবে।`)) {
+      // Remove from productsRepo
+      productsRepo = productsRepo.filter(p => p !== productName);
+      localStorage.setItem("productsRepo", JSON.stringify(productsRepo));
+      
+      // Remove from inventory if exists
+      tableData = tableData.filter(item => item.name !== productName);
+      localStorage.setItem("currentTableData", JSON.stringify(tableData));
+      
+      updateProductDropdown();
+      renderTable();
+      showProductList(); // Refresh the list
+      
+      alert(`"${productName}" প্রোডাক্ট সফলভাবে মুছে ফেলা হয়েছে!`);
+    }
+  }
+
+  // Add new item to inventory
+  function addItem() {
+    const name = document.getElementById("productSelect").value;
+    const qty = parseInt(document.getElementById("qtyInput").value);
+    const category = document.getElementById("categorySelect").value;
+
+    if (!name) {
+      alert("দয়া করে একটি প্রোডাক্ট নির্বাচন করুন!");
+      return;
+    }
+    
+    if (!qty || qty <= 0) {
+      alert("দয়া করে সঠিক পরিমাণ লিখুন!");
+      return;
+    }
+
+    // Check if product exists in repo
+    if (!productsRepo.includes(name)) {
+      alert("এই প্রোডাক্টটি সংরক্ষণ করা নেই! প্রথমে প্রোডাক্ট ম্যানেজমেন্ট থেকে প্রোডাক্ট সংরক্ষণ করুন।");
+      return;
+    }
+
+    // Add to table data
+    tableData.push({
+      id: Date.now() + Math.random(),
+      name,
+      qty,
+      category
+    });
+    
+    saveAndRender();
+    
+    // Clear inputs
+    document.getElementById("qtyInput").value = "";
+    document.getElementById("categorySelect").value = "other";
+    
+    // Focus on quantity input
+    document.getElementById("qtyInput").focus();
+  }
+
+  // Render table with items
+  function renderTable(items = tableData) {
+    const tbody = document.getElementById("listBody");
+    tbody.innerHTML = "";
+    
+    if (items.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="4" style="text-align: center; padding: 40px; color: var(--gray);">
+            📝 কোনো আইটেম পাওয়া যায়নি। নতুন আইটেম যোগ করুন।
+          </td>
+        </tr>
+      `;
+      return;
+    }
+    
+    items.forEach((item) => {
+      const categoryClass = item.category || "other";
+      const categoryName = categoryNames[categoryClass] || "অন্যান্য";
+      
+      const row = `
+        <tr>
+          <td style="font-weight: 600;">${item.name}</td>
+          <td>
+            <span class="category-badge ${categoryClass}">
+              ${categoryName}
+            </span>
+          </td>
+          <td style="font-weight: bold; color: var(--primary);">${item.qty}</td>
+          <td style="text-align: center;">
+            <div class="action-btns">
+              <button class="edit-btn" onclick="editItem(${item.id})">
+                সম্পাদনা
+              </button>
+              <button class="del-btn" onclick="deleteItem(${item.id})">
+                মুছুন
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+      tbody.insertAdjacentHTML('beforeend', row);
+    });
+    
+    updateSummary();
+  }
+
+  // Delete item
+  function deleteItem(id) {
+    tableData = tableData.filter(item => item.id !== id);
+    saveAndRender();
+  }
+
+  // Edit item
+  function editItem(id) {
+    const item = tableData.find(i => i.id === id);
+    
+    // Set values for editing
+    document.getElementById("productSelect").value = item.name;
+    document.getElementById("qtyInput").value = item.qty;
+    document.getElementById("categorySelect").value = item.category || "other";
+    
+    // Delete the item from list
+    deleteItem(id);
+    
+    // Focus on quantity input
+    document.getElementById("qtyInput").focus();
+  }
+
+  // Filter items based on search and category
+  function filterItems() {
+    const searchText = document.getElementById("searchInput").value.toLowerCase();
+    const selectedCategory = document.getElementById("categoryFilter").value;
+    
+    const filtered = tableData.filter(item => {
+      const matchesSearch = item.name.toLowerCase().includes(searchText);
+      const matchesCategory = selectedCategory === "all" || item.category === selectedCategory;
+      
+      return matchesSearch && matchesCategory;
+    });
+    
+    renderTable(filtered);
+  }
+
+  // Clear all filters
+  function clearFilters() {
+    document.getElementById("searchInput").value = "";
+    document.getElementById("categoryFilter").value = "all";
+    renderTable();
+  }
+
+  // Update summary statistics
+  function updateSummary() {
+    const totalItems = tableData.length;
+    const totalQty = tableData.reduce((sum, item) => sum + item.qty, 0);
+    
+    // Count unique categories
+    const categories = new Set(tableData.map(item => item.category));
+    const totalCategories = categories.size;
+    
+    document.getElementById("totalItems").innerText = totalItems;
+    document.getElementById("totalQty").innerText = totalQty;
+    document.getElementById("totalCategories").innerText = totalCategories;
+  }
+
+  // Export to Excel/CSV
+  function exportToExcel() {
+    if (tableData.length === 0) {
+      alert("রপ্তানি করার মতো কোনো ডেটা নেই!");
+      return;
+    }
+    
+    // Create CSV content
+    let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+    csvContent += "প্রোডাক্টের নাম,ক্যাটাগরি,পরিমাণ\n";
+    
+    tableData.forEach(item => {
+      const categoryName = categoryNames[item.category] || "অন্যান্য";
+      csvContent += `${item.name},${categoryName},${item.qty}\n`;
+    });
+    
+    // Create download link
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `inventory_${new Date().toLocaleDateString()}.csv`);
+    document.body.appendChild(link);
+    
+    // Trigger download
+    link.click();
+    document.body.removeChild(link);
+    
+    alert("ডেটা সফলভাবে CSV ফাইলে রপ্তানি করা হয়েছে!");
+  }
+
+  // Show clear confirmation modal
+  function showClearModal() {
+    if (tableData.length === 0) {
+      alert("মুছে ফেলার মতো কোনো আইটেম নেই!");
+      return;
+    }
+    
+    document.getElementById("clearModal").style.display = "flex";
+  }
+
+  // Close modal
+  function closeModal() {
+    document.getElementById("clearModal").style.display = "none";
+  }
+
+  // Clear all items
+  function clearAll() {
+    tableData = [];
+    saveAndRender();
+    closeModal();
+    alert("সকল আইটেম সফলভাবে মুছে ফেলা হয়েছে!");
+  }
+
+  // Save data to localStorage and re-render
+  function saveAndRender() {
+    localStorage.setItem("currentTableData", JSON.stringify(tableData));
+    renderTable();
+  }
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', function(event) {
+    // Ctrl + Enter to add item
+    if (event.ctrlKey && event.key === 'Enter') {
+      addItem();
+    }
+    
+    // Escape to clear filters
+    if (event.key === 'Escape') {
+      clearFilters();
+    }
+    
+    // Ctrl + E to export
+    if (event.ctrlKey && event.key === 'e') {
+      event.preventDefault();
+      exportToExcel();
+    }
+    
+    // Tab key navigation
+    if (event.key === 'Tab') {
+      // Focus management for better UX
+      const activeElement = document.activeElement;
+      const allInputs = document.querySelectorAll('input, select, button');
+      const currentIndex = Array.from(allInputs).indexOf(activeElement);
+      
+      if (currentIndex !== -1 && !event.shiftKey) {
+        event.preventDefault();
+        const nextIndex = (currentIndex + 1) % allInputs.length;
+        allInputs[nextIndex].focus();
+      }
+    }
+  });
+
+  // Enter key in new product input
+  document.getElementById('newProductInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      addProduct();
+    }
+  });
+
+  // Enter key in quantity input
+  document.getElementById('qtyInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      addItem();
+    }
+  });
+</script>
+
+</body>
+</html>
