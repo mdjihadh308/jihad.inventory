@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>পেশাদার ইনভেন্টরি ম্যানেজার</title>
+  <title>মিলন ইলেকট্রিক ওয়ার্কশপ</title>
   
   <style>
     :root {
@@ -25,7 +25,7 @@
     }
 
     .container {
-      max-width: 1000px;
+      max-width: 1100px;
       margin: 0 auto;
       background: white;
       padding: 30px;
@@ -97,7 +97,7 @@
 
     .form-grid {
       display: grid;
-      grid-template-columns: 2fr 1fr 1fr auto;
+      grid-template-columns: 2fr 1fr 1fr 1fr auto;
       gap: 15px;
       align-items: end;
     }
@@ -223,10 +223,21 @@
       font-weight: 600;
     }
 
-    .food { background: #d1fae5; color: #065f46; }
     .electronics { background: #dbeafe; color: #1e40af; }
-    .stationary { background: #fef3c7; color: #92400e; }
+    .cable { background: #c7d2fe; color: #3730a3; }
+    .box { background: #ddd6fe; color: #5b21b6; }
     .other { background: #e5e7eb; color: #374151; }
+
+    .unit-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      background: #f3f4f6;
+      color: #374151;
+      border: 1px solid #d1d5db;
+    }
 
     .action-btns {
       display: flex;
@@ -357,7 +368,7 @@
     }
 
     /* Responsive */
-    @media (max-width: 900px) {
+    @media (max-width: 1024px) {
       .mgmt-grid,
       .form-grid, 
       .search-section {
@@ -397,7 +408,10 @@
 <body>
 
 <div class="container">
-  <h2>📦 পেশাদার ইনভেন্টরি ব্যবস্থাপনা</h2>
+  <h2> মিলন ইলেকট্রিক ওয়ার্কশপ 
+    <br>
+    <small>মোবাইল: 01712-176706</small>
+</h2>
 
   <!-- Product Management Section -->
   <div class="product-mgmt">
@@ -432,16 +446,30 @@
       
       <div class="form-group">
         <label for="qtyInput">পরিমাণ</label>
-        <input type="number" id="qtyInput" placeholder="পরিমাণ" min="1" required>
+        <input type="number" id="qtyInput" placeholder="পরিমাণ" min="1" step="0.01" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="unitSelect">ইউনিট</label>
+        <select id="unitSelect">
+          <option value="piece">পিস</option>
+          <option value="dozen">ডজন</option>
+          <option value="packet">প্যাকেট</option>
+          <option value="kg">কেজি</option>
+          <option value="meter">মিটার</option>
+          <option value="roll">রোল</option>
+          <option value="set">সেট</option>
+          <option value="box">বাক্স</option>
+        </select>
       </div>
       
       <div class="form-group">
         <label for="categorySelect">ক্যাটাগরি</label>
         <select id="categorySelect">
-          <option value="other">অন্যান্য</option>
-          <option value="food">খাদ্যদ্রব্য</option>
           <option value="electronics">ইলেকট্রনিক্স</option>
-          <option value="stationary">লেখন সামগ্রী</option>
+          <option value="cable">ক্যাবল</option>
+          <option value="box">বক্স</option>
+          <option value="other">অন্যান্য</option>
         </select>
       </div>
       
@@ -462,9 +490,9 @@
       <label for="categoryFilter">ক্যাটাগরি ফিল্টার</label>
       <select id="categoryFilter" onchange="filterItems()">
         <option value="all">সব ক্যাটাগরি</option>
-        <option value="food">খাদ্যদ্রব্য</option>
         <option value="electronics">ইলেকট্রনিক্স</option>
-        <option value="stationary">লেখন সামগ্রী</option>
+        <option value="cable">ক্যাবল</option>
+        <option value="box">বক্স</option>
         <option value="other">অন্যান্য</option>
       </select>
     </div>
@@ -482,6 +510,7 @@
           <th>প্রোডাক্টের নাম</th>
           <th>ক্যাটাগরি</th>
           <th>পরিমাণ</th>
+          <th>ইউনিট</th>
           <th style="text-align: center;">কর্ম</th>
         </tr>
       </thead>
@@ -544,10 +573,22 @@
   
   // Category names in Bengali
   const categoryNames = {
-    "food": "খাদ্যদ্রব্য",
     "electronics": "ইলেকট্রনিক্স",
-    "stationary": "লেখন সামগ্রী",
+    "cable": "ক্যাবল",
+    "box": "বক্স",
     "other": "অন্যান্য"
+  };
+  
+  // Unit names in Bengali
+  const unitNames = {
+    "piece": "পিস",
+    "dozen": "ডজন",
+    "packet": "প্যাকেট",
+    "kg": "কেজি",
+    "meter": "মিটার",
+    "roll": "রোল",
+    "set": "সেট",
+    "box": "বাক্স"
   };
 
   // Initial Load
@@ -595,7 +636,7 @@
       document.getElementById("productSelect").value = name;
       document.getElementById("qtyInput").focus();
       
-      alert(`"${name}" প্রোডাক্ট সফলভাবে সংরক্ষণ করা হয়েছে!`);
+      alert(`${name} প্রোডাক্ট সফলভাবে সংরক্ষণ করা হয়েছে!`);
     } else {
       alert("এই প্রোডাক্টটি ইতিমধ্যে সংরক্ষণ করা আছে!");
     }
@@ -611,7 +652,7 @@
       listDiv.innerHTML = "";
       
       if (productsRepo.length === 0) {
-        listDiv.innerHTML = `<p style="text-align: center; color: var(--gray);">কোনো প্রোডাক্ট সংরক্ষণ করা নেই</p>`;
+        listDiv.innerHTML = '<p style="text-align: center; color: var(--gray);">কোনো প্রোডাক্ট সংরক্ষণ করা নেই</p>';
       } else {
         productsRepo.forEach((product, index) => {
           const itemDiv = document.createElement("div");
@@ -645,14 +686,15 @@
       renderTable();
       showProductList(); // Refresh the list
       
-      alert(`"${productName}" প্রোডাক্ট সফলভাবে মুছে ফেলা হয়েছে!`);
+      alert(`${productName} প্রোডাক্ট সফলভাবে মুছে ফেলা হয়েছে!`);
     }
   }
 
   // Add new item to inventory
   function addItem() {
     const name = document.getElementById("productSelect").value;
-    const qty = parseInt(document.getElementById("qtyInput").value);
+    const qty = parseFloat(document.getElementById("qtyInput").value);
+    const unit = document.getElementById("unitSelect").value;
     const category = document.getElementById("categorySelect").value;
 
     if (!name) {
@@ -676,6 +718,7 @@
       id: Date.now() + Math.random(),
       name,
       qty,
+      unit,
       category
     });
     
@@ -683,7 +726,8 @@
     
     // Clear inputs
     document.getElementById("qtyInput").value = "";
-    document.getElementById("categorySelect").value = "other";
+    document.getElementById("unitSelect").value = "piece";
+    document.getElementById("categorySelect").value = "electronics";
     
     // Focus on quantity input
     document.getElementById("qtyInput").focus();
@@ -697,7 +741,7 @@
     if (items.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="4" style="text-align: center; padding: 40px; color: var(--gray);">
+          <td colspan="5" style="text-align: center; padding: 40px; color: var(--gray);">
             📝 কোনো আইটেম পাওয়া যায়নি। নতুন আইটেম যোগ করুন।
           </td>
         </tr>
@@ -708,6 +752,7 @@
     items.forEach((item) => {
       const categoryClass = item.category || "other";
       const categoryName = categoryNames[categoryClass] || "অন্যান্য";
+      const unitName = unitNames[item.unit] || item.unit;
       
       const row = `
         <tr>
@@ -718,6 +763,9 @@
             </span>
           </td>
           <td style="font-weight: bold; color: var(--primary);">${item.qty}</td>
+          <td>
+            <span class="unit-badge">${unitName}</span>
+          </td>
           <td style="text-align: center;">
             <div class="action-btns">
               <button class="edit-btn" onclick="editItem(${item.id})">
@@ -749,7 +797,8 @@
     // Set values for editing
     document.getElementById("productSelect").value = item.name;
     document.getElementById("qtyInput").value = item.qty;
-    document.getElementById("categorySelect").value = item.category || "other";
+    document.getElementById("unitSelect").value = item.unit || "piece";
+    document.getElementById("categorySelect").value = item.category || "electronics";
     
     // Delete the item from list
     deleteItem(id);
@@ -790,7 +839,7 @@
     const totalCategories = categories.size;
     
     document.getElementById("totalItems").innerText = totalItems;
-    document.getElementById("totalQty").innerText = totalQty;
+    document.getElementById("totalQty").innerText = totalQty.toFixed(2);
     document.getElementById("totalCategories").innerText = totalCategories;
   }
 
@@ -803,11 +852,12 @@
     
     // Create CSV content
     let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
-    csvContent += "প্রোডাক্টের নাম,ক্যাটাগরি,পরিমাণ\n";
+    csvContent += "প্রোডাক্টের নাম,ক্যাটাগরি,পরিমাণ,ইউনিট\n";
     
     tableData.forEach(item => {
       const categoryName = categoryNames[item.category] || "অন্যান্য";
-      csvContent += `${item.name},${categoryName},${item.qty}\n`;
+      const unitName = unitNames[item.unit] || item.unit;
+      csvContent += `${item.name},${categoryName},${item.qty},${unitName}\n`;
     });
     
     // Create download link
