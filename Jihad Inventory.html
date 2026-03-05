@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MD ABDULLAH AL - JIHAD</title>
+  <title>মিলন ইলেকট্রিক ওয়ার্কশপ - ইনভেন্টরি</title>
   <style>
     :root {
       --primary: #4f46e5;
@@ -62,6 +62,7 @@
       grid-template-columns: 1fr auto auto;
       gap: 15px;
       align-items: center;
+      margin-bottom: 15px;
     }
 
     .mgmt-grid input {
@@ -111,6 +112,91 @@
       font-weight: 600;
       color: var(--dark);
       font-size: 14px;
+    }
+
+    /* Searchable Input Styles */
+    .searchable-input {
+      position: relative;
+      width: 100%;
+    }
+
+    #productSelect {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 15px;
+      background: white;
+      transition: all 0.3s;
+    }
+
+    #productSelect:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+      outline: none;
+    }
+
+    /* Custom dropdown for better UX */
+    .custom-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      max-height: 250px;
+      overflow-y: auto;
+      z-index: 1000;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      display: none;
+    }
+
+    .custom-dropdown.show {
+      display: block;
+    }
+
+    .dropdown-item {
+      padding: 10px 15px;
+      cursor: pointer;
+      border-bottom: 1px solid #f1f5f9;
+      transition: background 0.2s;
+    }
+
+    .dropdown-item:last-child {
+      border-bottom: none;
+    }
+
+    .dropdown-item:hover {
+      background: #eef2ff;
+    }
+
+    .dropdown-item.highlighted {
+      background: #e0e7ff;
+    }
+
+    .no-results {
+      padding: 15px;
+      text-align: center;
+      color: var(--gray);
+      font-style: italic;
+    }
+
+    /* Quick add hint */
+    .quick-add-hint {
+      font-size: 12px;
+      color: var(--gray);
+      margin-top: 5px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .quick-add-hint span {
+      background: #e5e7eb;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
     }
 
     input, select {
@@ -430,15 +516,24 @@
     </div>
   </div>
 
-  <!-- Add Item Form -->
+  <!-- Add Item Form with Searchable Product Selection -->
   <div class="form-section">
     <h3>➕ নতুন আইটেম যোগ করুন</h3>
     <div class="form-grid">
       <div class="form-group">
-        <label for="productSelect">প্রোডাক্ট নির্বাচন করুন</label>
-        <select id="productSelect" required>
-          <option value="">-- প্রোডাক্ট নির্বাচন করুন --</option>
-        </select>
+        <label for="productSelect">প্রোডাক্ট নির্বাচন করুন (টাইপ করে খুঁজুন)</label>
+        <div class="searchable-input">
+          <!-- Method 1: Using datalist (simple but effective) -->
+          <input list="productListData" id="productSelect" placeholder="প্রোডাক্টের নাম লিখুন... যেমন: সুইচ, তার, বাতি" autocomplete="off">
+          <datalist id="productListData"></datalist>
+          
+          <!-- Quick add hint -->
+          <div class="quick-add-hint">
+            <span>🔍 টাইপ করুন</span>
+            <span>⏎ এন্টার</span>
+            <span>↓ ↑ নেভিগেট</span>
+          </div>
+        </div>
       </div>
       
       <div class="form-group">
@@ -590,29 +685,64 @@
 
   // Initial Load
   window.onload = () => {
-    updateProductDropdown();
+    updateProductDropdown(); // Update the searchable dropdown
     renderTable();
     updateSummary();
+    setupProductSearch(); // Setup additional search features
   };
 
-  // Update product dropdown
+  // UPDATED: Update product dropdown using datalist (searchable)
   function updateProductDropdown() {
-    const select = document.getElementById("productSelect");
-    select.innerHTML = '<option value="">-- প্রোডাক্ট নির্বাচন করুন --</option>';
-    
-    // Sort products alphabetically
+    const datalist = document.getElementById("productListData");
+    datalist.innerHTML = "";
+
+    // Sort products alphabetically for better organization
     productsRepo.sort();
-    
+
     productsRepo.forEach(product => {
-      const option = new Option(product, product);
-      select.add(option);
+      const option = document.createElement("option");
+      option.value = product;
+      datalist.appendChild(option);
     });
-    
-    // Update product count
+
     document.getElementById("productCount").innerText = productsRepo.length;
   }
 
-  // Add new product to repo
+  // Setup product search enhancements
+  function setupProductSearch() {
+    const productInput = document.getElementById("productSelect");
+    
+    // Handle Enter key - move to quantity field
+    productInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('qtyInput').focus();
+      }
+    });
+    
+    // Handle input change - validate if product exists
+    productInput.addEventListener('change', function() {
+      const value = this.value;
+      if (value && !productsRepo.includes(value)) {
+        // New product typed - offer to add it
+        if (confirm(`"${value}" প্রোডাক্টটি সংরক্ষণ করা নেই। এটি কি নতুন প্রোডাক্ট হিসেবে যোগ করবেন?`)) {
+          addNewProductFromInput(value);
+        }
+      }
+    });
+  }
+
+  // Add new product from input field
+  function addNewProductFromInput(productName) {
+    if (!productsRepo.includes(productName)) {
+      productsRepo.push(productName);
+      localStorage.setItem("productsRepo", JSON.stringify(productsRepo));
+      updateProductDropdown();
+      alert(`"${productName}" প্রোডাক্ট সফলভাবে সংরক্ষণ করা হয়েছে!`);
+    }
+  }
+
+  // Add new product to repo (original function)
   function addProduct() {
     const name = document.getElementById("newProductInput").value.trim();
     
@@ -629,11 +759,11 @@
       // Clear input
       document.getElementById("newProductInput").value = "";
       
-      // Auto-select the new product
+      // Auto-select the new product in searchable input
       document.getElementById("productSelect").value = name;
       document.getElementById("qtyInput").focus();
       
-      alert(`${name} প্রোডাক্ট সফলভাবে সংরক্ষণ করা হয়েছে!`);
+      alert(`"${name}" প্রোডাক্ট সফলভাবে সংরক্ষণ করা হয়েছে!`);
     } else {
       alert("এই প্রোডাক্টটি ইতিমধ্যে সংরক্ষণ করা আছে!");
     }
@@ -726,25 +856,33 @@
 
   // Add new item to inventory
   function addItem() {
-    const name = document.getElementById("productSelect").value;
+    const nameInput = document.getElementById("productSelect");
+    const name = nameInput.value.trim();
     const qty = parseFloat(document.getElementById("qtyInput").value);
     const unit = document.getElementById("unitSelect").value;
     const category = document.getElementById("categorySelect").value;
 
     if (!name) {
-      alert("দয়া করে একটি প্রোডাক্ট নির্বাচন করুন!");
+      alert("দয়া করে একটি প্রোডাক্ট নির্বাচন করুন বা নাম লিখুন!");
+      nameInput.focus();
       return;
     }
     
     if (!qty || qty <= 0) {
       alert("দয়া করে সঠিক পরিমাণ লিখুন!");
+      document.getElementById("qtyInput").focus();
       return;
     }
 
-    // Check if product exists in repo
+    // Check if product exists in repo, if not, add it automatically
     if (!productsRepo.includes(name)) {
-      alert("এই প্রোডাক্টটি সংরক্ষণ করা নেই! প্রথমে প্রোডাক্ট ম্যানেজমেন্ট থেকে প্রোডাক্ট সংরক্ষণ করুন।");
-      return;
+      if (confirm(`"${name}" প্রোডাক্টটি সংরক্ষণ করা নেই। এটি কি নতুন প্রোডাক্ট হিসেবে যোগ করবেন?`)) {
+        productsRepo.push(name);
+        localStorage.setItem("productsRepo", JSON.stringify(productsRepo));
+        updateProductDropdown();
+      } else {
+        return; // Cancel adding item
+      }
     }
 
     // Add to table data
@@ -758,13 +896,21 @@
     
     saveAndRender();
     
-    // Clear inputs
+    // Clear quantity but keep product name for quick multiple entries
     document.getElementById("qtyInput").value = "";
-    document.getElementById("unitSelect").value = "piece";
-    document.getElementById("categorySelect").value = "electronics";
     
-    // Focus on quantity input
+    // Focus back on quantity for next entry
     document.getElementById("qtyInput").focus();
+    
+    // Show success message
+    showToast(`${name} যোগ করা হয়েছে!`);
+  }
+
+  // Simple toast notification
+  function showToast(message) {
+    // You can implement a toast notification here
+    // For now, just console log
+    console.log(message);
   }
 
   // Render table with items
@@ -820,8 +966,10 @@
 
   // Delete item
   function deleteItem(id) {
-    tableData = tableData.filter(item => item.id !== id);
-    saveAndRender();
+    if (confirm("আইটেমটি মুছে ফেলতে চান?")) {
+      tableData = tableData.filter(item => item.id !== id);
+      saveAndRender();
+    }
   }
 
   // Edit item
@@ -835,7 +983,8 @@
     document.getElementById("categorySelect").value = item.category || "electronics";
     
     // Delete the item from list
-    deleteItem(id);
+    tableData = tableData.filter(i => i.id !== id);
+    saveAndRender();
     
     // Focus on quantity input
     document.getElementById("qtyInput").focus();
@@ -941,6 +1090,7 @@
   document.addEventListener('keydown', function(event) {
     // Ctrl + Enter to add item
     if (event.ctrlKey && event.key === 'Enter') {
+      event.preventDefault();
       addItem();
     }
     
@@ -955,18 +1105,10 @@
       exportToExcel();
     }
     
-    // Tab key navigation
-    if (event.key === 'Tab') {
-      // Focus management for better UX
-      const activeElement = document.activeElement;
-      const allInputs = document.querySelectorAll('input, select, button');
-      const currentIndex = Array.from(allInputs).indexOf(activeElement);
-      
-      if (currentIndex !== -1 && !event.shiftKey) {
-        event.preventDefault();
-        const nextIndex = (currentIndex + 1) % allInputs.length;
-        allInputs[nextIndex].focus();
-      }
+    // F2 to focus on product search
+    if (event.key === 'F2') {
+      event.preventDefault();
+      document.getElementById('productSelect').focus();
     }
   });
 
@@ -983,9 +1125,14 @@
       addItem();
     }
   });
+
+  // Focus on product select on page load
+  window.addEventListener('load', function() {
+    setTimeout(() => {
+      document.getElementById('productSelect').focus();
+    }, 100);
+  });
 </script>
 
 </body>
 </html>
-
-
